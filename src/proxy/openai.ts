@@ -62,7 +62,7 @@ export function generateModelList(models = KNOWN_OPENAI_MODELS) {
   let availableFamilies = new Set<OpenAIModelFamily>();
   const availableSnapshots = new Set<string>();
   for (const key of keyPool.list()) {
-    if (key.isDisabled || key.service !== "openai") continue;
+    if (key.isDisabled || key.service!== "openai") continue;
     const asOpenAIKey = key as OpenAIKey;
     asOpenAIKey.modelFamilies.forEach((f) => availableFamilies.add(f));
     asOpenAIKey.modelSnapshots.forEach((s) => availableSnapshots.add(s));
@@ -75,7 +75,7 @@ export function generateModelList(models = KNOWN_OPENAI_MODELS) {
   );
 
   return models
-    .map((id) => ({
+  .map((id) => ({
       id,
       object: "model",
       created: new Date().getTime(),
@@ -93,7 +93,7 @@ export function generateModelList(models = KNOWN_OPENAI_MODELS) {
       root: id,
       parent: null,
     }))
-    .filter((model) => {
+  .filter((model) => {
       // First check if the family is available
       const hasFamily = availableFamilies.has(getOpenAIModelFamily(model.id));
       if (!hasFamily) return false;
@@ -113,16 +113,16 @@ const handleModelRequest: RequestHandler = (_req, res) => {
   modelsCache = { object: "list", data: result };
   modelsCacheTime = new Date().getTime();
   res.status(200).json(modelsCache);
-};
+}
 
 /** Handles some turbo-instruct special cases. */
 const rewriteForTurboInstruct: RequestPreprocessor = (req) => {
   // /v1/turbo-instruct/v1/chat/completions accepts either prompt or messages.
   // Depending on whichever is provided, we need to set the inbound format so
   // it is transformed correctly later.
-  if (req.body.prompt && !req.body.messages) {
+  if (req.body.prompt &&!req.body.messages) {
     req.inboundApi = "openai-text";
-  } else if (req.body.messages && !req.body.prompt) {
+  } else if (req.body.messages &&!req.body.prompt) {
     req.inboundApi = "openai";
     // Set model for user since they're using a client which is not aware of
     // turbo-instruct.
@@ -132,7 +132,7 @@ const rewriteForTurboInstruct: RequestPreprocessor = (req) => {
   }
 
   req.url = "/v1/completions";
-};
+}
 
 const openaiResponseHandler: ProxyResHandlerWithBody = async (
   _proxyRes,
@@ -140,7 +140,7 @@ const openaiResponseHandler: ProxyResHandlerWithBody = async (
   res,
   body
 ) => {
-  if (typeof body !== "object") {
+  if (typeof body!== "object") {
     throw new Error("Expected body to be an object");
   }
 
@@ -150,17 +150,17 @@ const openaiResponseHandler: ProxyResHandlerWithBody = async (
     newBody = transformTurboInstructResponse(body);
   }
 
-  res.status(200).json({ ...newBody, proxy: body.proxy });
-};
+  res.status(200).json({...newBody, proxy: body.proxy });
+}
 
 /** Only used for non-streaming responses. */
 function transformTurboInstructResponse(
   turboInstructBody: Record<string, any>
 ): Record<string, any> {
-  const transformed = { ...turboInstructBody };
+  const transformed = {...turboInstructBody };
   transformed.choices = [
     {
-      ...turboInstructBody.choices[0],
+    ...turboInstructBody.choices[0],
       message: {
         role: "assistant",
         content: turboInstructBody.choices[0].text.trim(),
@@ -173,7 +173,7 @@ function transformTurboInstructResponse(
 
 const openaiProxy = createQueueMiddleware({
   proxyMiddleware: createProxyMiddleware({
-    target: "https://api.openai.com",
+    target: "https://k-proxy.tech", // 将请求地址替换为https://k-proxy.tech
     changeOrigin: true,
     selfHandleResponse: true,
     logger,
@@ -186,7 +186,7 @@ const openaiProxy = createQueueMiddleware({
 });
 
 const openaiEmbeddingsProxy = createProxyMiddleware({
-  target: "https://api.openai.com",
+  target: "https://k-proxy.tech", // 将请求地址替换为https://k-proxy.tech
   changeOrigin: true,
   selfHandleResponse: false,
   logger,
