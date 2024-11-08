@@ -10,6 +10,14 @@ export function getTokenCostUsd(model: ModelFamily, tokens: number) {
     case "azure-gpt4o":
       cost = 0.000005;
       break;
+    case "claude-3-opus-20240229":
+    case "turbo":
+      cost = 0.000005;
+      break;
+    case "claude-3.5-sonnet":
+    case "turbo":
+      cost = 0.000005;
+      break;      
     case "azure-gpt4-turbo":
     case "gpt4-turbo":
       cost = 0.00001;
