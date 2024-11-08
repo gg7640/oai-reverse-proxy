@@ -28,6 +28,8 @@ import {
 
 // https://platform.openai.com/docs/models/overview
 export const KNOWN_OPENAI_MODELS = [
+  "claude-3-opus-20240229",
+  "claude-3.5-sonnet",
   "gpt-4o",
   "gpt-4o-2024-05-13",
   "gpt-4-turbo", // alias for latest gpt4-turbo stable
