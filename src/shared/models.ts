@@ -84,6 +84,8 @@ export const LLM_SERVICES = (<A extends readonly LLMService[]>(
 ] as const);
 
 export const OPENAI_MODEL_FAMILY_MAP: { [regex: string]: OpenAIModelFamily } = {
+  "^gclaude-3-opus-20240229": "turbo",
+  "^claude-3.5-sonnet": "turbo",
   "^gpt-4o": "gpt4o",
   "^gpt-4-turbo(-\\d{4}-\\d{2}-\\d{2})?$": "gpt4-turbo",
   "^gpt-4-turbo(-preview)?$": "gpt4-turbo",
